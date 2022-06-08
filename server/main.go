@@ -15,6 +15,12 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+type BlogItem struct {
+	ID        primitive.ObjectID `bson:"_id,omitempty"`
+	Author_Id string             `bson:"author_id"`
+	Title     string             `bson:"title"`
+	Content   string             `bson:"content"`
+}
 type Server struct {
 	pb.BlogServiceServer
 }
@@ -54,8 +60,17 @@ func main() {
 
 }
 
+func documentToBlog(data *BlogItem) *pb.Blog {
+	return &pb.Blog{
+		Id:       data.ID.Hex(),
+		AuthorId: data.Author_Id,
+		Title:    data.Title,
+		Content:  data.Content,
+	}
+
+}
 func (s *Server) Create_New_Blog(ctx context.Context, in *pb.Blog) (*pb.BlogId, error) {
-	log.Println("____  _Blog Function Was Invoked At Server  ____")
+	log.Println("____  Create_New_Blog Function Was Invoked At Server  ____")
 
 	var data = BlogItem{
 		Author_Id: in.AuthorId,
@@ -85,14 +100,14 @@ func (s *Server) Create_New_Blog(ctx context.Context, in *pb.Blog) (*pb.BlogId, 
 }
 
 // func (s *Server) Read_Blog(ctx context.Context, id *pb.BlogId) (*pb.Blog, error) {
-// 	log.Println("____  _Blog Function Was Invoked At Server  ____")
+// 	log.Println("____  Read_Blog Function Was Invoked At Server  ____")
 // }
 // func (s *Server) Update_Blog(ctx context.Context, data *pb.Blog) (*emptypb.Empty, error) {
-// 	log.Println("____  _Blog Function Was Invoked At Server  ____")
+// 	log.Println("____  Update_Blog Function Was Invoked At Server  ____")
 // }
 // func (s *Server) Delete_Blog(ctx context.Context, id *pb.BlogId) (*emptypb.Empty, error) {
-// 	log.Println("____  _Blog Function Was Invoked At Server  ____")
+// 	log.Println("____  Delete_Blog Function Was Invoked At Server  ____")
 // }
 // func (s *Server) List_All_Blogs(n *emptypb.Empty, stream pb.BlogService_List_All_BlogsServer) error {
-// 	log.Println("____  _Blog Function Was Invoked At Server  ____")
+// 	log.Println("____  List_All_Blog Function Was Invoked At Server  ____")
 // }

@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package blog ;
+
+option go_package = "github.com/gowithvikash/grpc_with_go/blog/proto";
+
+import "google/protobuf/empty.proto";
+
+message Blog{
+    string id = 1;
+    string author_id = 2;
+    string title = 3;
+    string content = 4;
+
+}
+message BlogId{
+    string id = 1;
+
+}
+service BlogService {
+    rpc Create_New_Blog (Blog) returns (BlogId);
+    rpc Read_Blog (BlogId) returns (Blog);
+    rpc Update_Blog (Blog) returns (google.protobuf.Empty);
+    rpc Delete_Blog (BlogId) returns (google.protobuf.Empty);
+    rpc List_All_Blogs (google.protobuf.Empty) returns (stream Blog);
+}
+
+
+// protoc -Iproto --go_opt=module=github.com/gowithvikash/grpc_with_go/blog/proto --go-grpc_opt=module=github.com/gowithvikash/grpc_with_go/blog/proto --go_out=proto/. --go-grpc_out=proto/. proto/blog.proto

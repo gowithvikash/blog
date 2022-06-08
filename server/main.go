@@ -2,13 +2,17 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net"
 
 	pb "github.com/gowithvikash/grpc_with_go/blog/proto"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type Server struct {
@@ -50,8 +54,34 @@ func main() {
 
 }
 
-func (s *Server) Create_New_Blog(ctx context.Context, data *pb.Blog) (*pb.BlogId, error) {
+func (s *Server) Create_New_Blog(ctx context.Context, in *pb.Blog) (*pb.BlogId, error) {
 	log.Println("____  _Blog Function Was Invoked At Server  ____")
+
+	var data = BlogItem{
+		Author_Id: in.AuthorId,
+		Title:     in.Title,
+		Content:   in.Content,
+	}
+	res, err := collection.InsertOne(ctx, data)
+	if err != nil {
+		return nil, status.Errorf(
+			codes.Internal,
+			fmt.Sprintf("internal server error %v", err),
+		)
+	}
+
+	oid, ok := res.InsertedID.(primitive.ObjectID)
+	if !ok {
+		return nil, status.Errorf(
+			codes.Internal,
+			"Can not convert OID",
+		)
+	}
+
+	return &pb.BlogId{
+		Id: oid.Hex(),
+	}, nil
+
 }
 
 // func (s *Server) Read_Blog(ctx context.Context, id *pb.BlogId) (*pb.Blog, error) {
